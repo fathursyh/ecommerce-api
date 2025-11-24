@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        app('router')->prependMiddlewareToGroup(
+            'api',
+            \App\Http\Middleware\ForceJson::class
+        );
+
     }
 }

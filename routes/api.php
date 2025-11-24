@@ -56,3 +56,7 @@ Route::prefix('v1')->group(function () {
     // Route::apiResource('products', ProductController::class)->only(['index', 'show']);
     // Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 });
+
+Route::fallback(function () {
+    abort(404, 'API resource not found');
+});
