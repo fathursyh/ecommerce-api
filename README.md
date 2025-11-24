@@ -1,59 +1,220 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 E-Commerce Backend API (Laravel + Sanctum)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**Early Development Documentation**
 
-## About Laravel
+This repository contains the backend API for our e-commerce platform built with **Laravel** and authenticated using **Sanctum**.
+The API is consumed by two separate frontend applications:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+* **Next.js**
+* **Angular**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The backend is designed to be modular, secure, and easily scalable.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 📦 Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+| Layer                      | Technology                                 |
+| -------------------------- | ------------------------------------------ |
+| Backend Framework          | Laravel 11                                 |
+| API Authentication         | Laravel Sanctum                            |
+| Database                   | MySQL                                      |
+| ORM                        | Eloquent                                   |
+| Caching / Queue (optional) | Redis                                      |
+| Storage                    | Local / S3 / Cloudflare R2                 |
+| API Docs                   | Laravel Swagger (L5-Swagger) *(planned)*   |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🗂 Project Structure (Laravel Standard)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```
+/app
+ ├─ Http/
+ │   ├─ Controllers/
+ │   ├─ Middleware/
+ │   ├─ Requests/
+ │   └─ Resources/
+ ├─ Models/
+ ├─ Providers/
+ ├─ Services/
+ └─ Helpers/
+├─ routes/
+│   └─ api.php
+├─ database/
+│   ├─ migrations/
+│   ├─ seeders/
+│   └─ factories/
+```
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🔐 Authentication Flow (Sanctum)
 
-## Contributing
+Sanctum supports two approaches.
+For this API we use **Token Authentication**, which works for multi-domain clients like Next.js & Angular.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Login Flow:
 
-## Code of Conduct
+1. Frontend sends email & password
+2. Backend verifies credentials
+3. Backend responds with:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   * access token
+   * user data
+4. Frontend stores token securely (local storage / secure storage)
+5. All further requests include the token in the Authorization header:
 
-## Security Vulnerabilities
+```
+Authorization: Bearer <token>
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 📘 API Overview (Initial Draft)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+All routes are prefixed with:
+
+```
+/api/v1/
+```
+
+---
+
+### **Auth**
+
+| Method | Endpoint                | Description                    |
+| ------ | ----------------------- | ------------------------------ |
+| POST   | `/api/v1/auth/register` | Register new user (customer)   |
+| POST   | `/api/v1/auth/login`    | Login + generate Sanctum token |
+| POST   | `/api/v1/auth/logout`   | Revoke token                   |
+| GET    | `/api/v1/auth/user`     | Get authenticated user         |
+
+---
+
+### **Products**
+
+| Method | Endpoint                | Description    | Access |
+| ------ | ----------------------- | -------------- | ------ |
+| GET    | `/api/v1/products`      | List products  | Public |
+| GET    | `/api/v1/products/{id}` | Single product | Public |
+| POST   | `/api/v1/products`      | Create product | Admin  |
+| PUT    | `/api/v1/products/{id}` | Update product | Admin  |
+| DELETE | `/api/v1/products/{id}` | Delete product | Admin  |
+
+---
+
+### **Categories**
+
+| Method | Endpoint                  | Description     | Access |
+| ------ | ------------------------- | --------------- | ------ |
+| GET    | `/api/v1/categories`      | List categories | Public |
+| POST   | `/api/v1/categories`      | Create category | Admin  |
+| PUT    | `/api/v1/categories/{id}` | Update category | Admin  |
+| DELETE | `/api/v1/categories/{id}` | Delete category | Admin  |
+
+---
+
+### **Cart**
+
+| Method | Endpoint                       | Description      | Access   |
+| ------ | ------------------------------ | ---------------- | -------- |
+| GET    | `/api/v1/cart`                 | Get cart         | Customer |
+| POST   | `/api/v1/cart/add`             | Add item to cart | Customer |
+| PUT    | `/api/v1/cart/update/{itemId}` | Update quantity  | Customer |
+| DELETE | `/api/v1/cart/{itemId}`        | Remove item      | Customer |
+
+---
+
+### **Orders**
+
+| Method | Endpoint               | Description         | Access   |
+| ------ | ---------------------- | ------------------- | -------- |
+| POST   | `/api/v1/orders`       | Create order        | Customer |
+| GET    | `/api/v1/orders`       | Customer order list | Customer |
+| GET    | `/api/v1/orders/{id}`  | Single order detail | Customer |
+| GET    | `/api/v1/admin/orders` | List all orders     | Admin    |
+
+---
+
+### **Admin Routes (Optional separate grouping)**
+
+For Angular admin dashboard:
+
+| Method | Endpoint                      | Description           |
+| ------ | ----------------------------- | --------------------- |
+| GET    | `/api/v1/admin/products`      | Admin product list    |
+| POST   | `/api/v1/admin/products`      | Create product        |
+| PUT    | `/api/v1/admin/products/{id}` | Update product        |
+| DELETE | `/api/v1/admin/products/{id}` | Delete product        |
+| GET    | `/api/v1/admin/orders`        | View all orders       |
+| GET    | `/api/v1/admin/users`         | List users (optional) |
+
+---
+
+## 🧪 Local Development Setup
+
+```bash
+git clone https://github.com/fathursyh/ecommerce-api
+cd ecommerce-api
+
+composer install
+cp .env.example .env
+
+php artisan key:generate
+
+# Migrate database
+php artisan migrate --seed
+
+# Start dev server
+composer run dev
+```
+
+Example `.env` configuration:
+
+```
+APP_NAME=EcommerceAPI
+APP_ENV=local
+APP_KEY=base64:xxxx
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=ecommerce
+DB_USERNAME=root
+DB_PASSWORD=
+
+SANCTUM_STATEFUL_DOMAINS=localhost:3000,localhost:4200
+SESSION_DRIVER=cookie
+SESSION_DOMAIN=localhost
+```
+
+---
+
+## 🛠 Roadmap
+
+* [x] User registration & login
+* [ ] Sanctum token abilities for role-based access
+* [ ] Product & category modules
+* [ ] Cart + checkout logic
+* [ ] Order lifecycle
+* [ ] Admin endpoint separation
+* [ ] API documentation (Swagger/L5-Swagger)
+* [ ] Seeders for development data
+* [ ] Rate limiting configuration
+
+---
+
+## 🤝 Contribution Guide
+
+* Use feature branches (`feature/products-module`)
+* Maintain consistent code formatting
+* PRs must include:
+
+  * description of the change
+  * testing steps
+  * API contract updates if needed
+
+---
+
