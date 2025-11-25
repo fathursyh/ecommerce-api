@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
@@ -15,6 +16,7 @@ use Storage;
 
 class ProductController extends Controller
 {
+    use ApiResponse;
     /**
      * Display a listing of the resource.
      */
@@ -105,18 +107,7 @@ class ProductController extends Controller
 
         $products = $query->paginate($perPage);
 
-        return response()->json([
-            'success' => true,
-            'data' => ProductResource::collection($products),
-            'meta' => [
-                'current_page' => $products->currentPage(),
-                'from' => $products->firstItem(),
-                'last_page' => $products->lastPage(),
-                'per_page' => $products->perPage(),
-                'to' => $products->lastItem(),
-                'total' => $products->total(),
-            ],
-        ]);
+        return $this->paginatedResponse(ProductResource::collection($products));
     }
 
 
@@ -149,20 +140,20 @@ class ProductController extends Controller
 
             $product->load(['category', 'images']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product created successfully',
-                'data' => new ProductResource($product),
-            ], 201);
+            return $this->successResponse(
+                new ProductResource($product),
+                'Product created successfully',
+                201
+            );
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create product',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->errorResponse(
+                'Failed to create product',
+                500,
+                $e->getMessage()
+            );
         }
     }
 
@@ -187,10 +178,9 @@ class ProductController extends Controller
             $product = $query->where('slug', $id)->firstOrFail();
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => new ProductResource($product),
-        ]);
+        return $this->successResponse(
+            new ProductResource($product)
+        );
     }
 
     /**
@@ -239,20 +229,19 @@ class ProductController extends Controller
 
             $product->load(['category', 'images']);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product updated successfully',
-                'data' => new ProductResource($product),
-            ]);
+            return $this->successResponse(
+                new ProductResource($product),
+                'Product updated successfully'
+            );
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to update product',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->errorResponse(
+                'Failed to update product',
+                500,
+                $e->getMessage()
+            );
         }
     }
 
@@ -274,19 +263,19 @@ class ProductController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Product deleted successfully',
-            ]);
+            return $this->successResponse(
+                null,
+                'Product deleted successfully'
+            );
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete product',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->errorResponse(
+                'Failed to delete product',
+                500,
+                $e->getMessage(),
+            );
         }
     }
 
@@ -314,11 +303,10 @@ class ProductController extends Controller
 
         $image->update($request->only(['is_primary', 'sort_order']));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product image updated successfully',
-            'data' => new ProductImageResource($image),
-        ]);
+        return $this->successResponse(
+            new ProductImageResource($image),
+            'Product image updated successfully'
+        );
     }
     /**
      * Get featured products
@@ -335,10 +323,9 @@ class ProductController extends Controller
             ->limit($limit)
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => ProductResource::collection($products),
-        ]);
+        return $this->successResponse(
+            ProductResource::collection($products),
+        );
     }
     /**
      * Get related products (same category)
@@ -357,9 +344,8 @@ class ProductController extends Controller
             ->limit($limit)
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => ProductResource::collection($relatedProducts),
-        ]);
+        return $this->successResponse(
+            ProductResource::collection($relatedProducts),
+        );
     }
 }

@@ -31,7 +31,6 @@ class UpdateProductRequest extends FormRequest
             'short_description' => ['nullable', 'string', 'max:500'],
             'price' => ['sometimes', 'required', 'numeric', 'min:0'],
             'sale_price' => ['nullable', 'numeric', 'min:0', 'lt:price'],
-            'sku' => ['sometimes', 'required', 'string', 'max:100', Rule::unique('products')->ignore($productId)],
             'stock_quantity' => ['sometimes', 'required', 'integer', 'min:0'],
             'category_id' => ['sometimes', 'required', 'exists:categories,id'],
             'weight' => ['nullable', 'numeric', 'min:0'],

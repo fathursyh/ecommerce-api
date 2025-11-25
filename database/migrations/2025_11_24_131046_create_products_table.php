@@ -19,13 +19,12 @@ return new class extends Migration
             $table->text('short_description')->nullable();
             $table->decimal('price', 10, 2);
             $table->decimal('sale_price', 10, 2)->nullable();
-            $table->string('sku')->unique();
             $table->integer('stock_quantity')->default(0);
             $table->boolean('is_active')->default(true);
             $table->boolean('is_featured')->default(false);
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->decimal('weight', 8, 2)->nullable();
-            $table->json('meta_data')->nullable(); // For flexible attributes
+            $table->json('meta_data')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

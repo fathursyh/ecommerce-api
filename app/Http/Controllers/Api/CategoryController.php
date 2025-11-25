@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
@@ -14,6 +15,7 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
+    use ApiResponse;
     /**
      * Display a listing of categories
      * GET /api/v1/categories
@@ -62,26 +64,15 @@ class CategoryController extends Controller
 
         if ($request->has('paginate') && !$request->boolean('paginate')) {
             $categories = $query->get();
-            return response()->json([
-                'success' => true,
-                'data' => CategoryResource::collection($categories),
-            ]);
+         ;
+            return $this->successResponse(
+                CategoryResource::collection($categories)
+            );
         }
 
         $categories = $query->paginate($perPage);
 
-        return response()->json([
-            'success' => true,
-            'data' => CategoryResource::collection($categories),
-            'meta' => [
-                'current_page' => $categories->currentPage(),
-                'from' => $categories->firstItem(),
-                'last_page' => $categories->lastPage(),
-                'per_page' => $categories->perPage(),
-                'to' => $categories->lastItem(),
-                'total' => $categories->total(),
-            ],
-        ]);
+        return $this->paginatedResponse(CategoryResource::collection($categories));
     }
     public function store(StoreCategoryRequest $request): JsonResponse
     {
@@ -94,18 +85,18 @@ class CategoryController extends Controller
 
         $category = Category::create($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category created successfully',
-            'data' => new CategoryResource($category),
-        ], 201);
+        return $this->successResponse(
+            new CategoryResource($category),
+            'Category created successfully',
+            201
+        );
     }
 
     /**
      * Display the specified category
      * GET /api/v1/categories/{id}
      */
-    public function show(Request $request, $id): JsonResponse
+    public function show(Request $request, string $id): JsonResponse
     {
         $query = Category::query();
 
@@ -140,10 +131,9 @@ class CategoryController extends Controller
 
         $category = $query->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'data' => new CategoryResource($category),
-        ]);
+        return $this->successResponse(
+            new CategoryResource($category),
+        );
     }
 
     /**
@@ -165,11 +155,10 @@ class CategoryController extends Controller
 
         $category->update($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category updated successfully',
-            'data' => new CategoryResource($category),
-        ]);
+        return $this->successResponse(
+            new CategoryResource($category),
+            'Category updated successfully'
+        );
     }
 
     /**
@@ -180,18 +169,18 @@ class CategoryController extends Controller
     {
         // Check if category has products
         if ($category->products()->count() > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete category with existing products',
-            ], 422);
+            return $this->errorResponse(
+                'Cannot delete category with existing products',
+                422
+            );
         }
 
         // Check if category has children
         if ($category->children()->count() > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete category with child categories',
-            ], 422);
+            return $this->errorResponse(
+                'Cannot delete category with child categories',
+                422
+            );
         }
 
         // Delete image if exists
@@ -201,10 +190,10 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Category deleted successfully',
-        ]);
+        return $this->successResponse(
+            null,
+            'Category deleted successfully'
+        );
     }
     public function tree(Request $request): JsonResponse
     {
@@ -222,9 +211,8 @@ class CategoryController extends Controller
 
         $categories = $query->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => CategoryResource::collection($categories),
-        ]);
+        return $this->successResponse(
+            CategoryResource::collection($categories)
+        );
     }
 }
