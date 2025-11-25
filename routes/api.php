@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ProductController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -19,6 +21,17 @@ Route::prefix('v1')->group(function () {
         });
     });
 
+    // categories
+    Route::get('categories', [CategoryController::class, 'index']);
+    Route::get('categories/tree', [CategoryController::class, 'tree']);
+    Route::get('categories/{category}', [CategoryController::class, 'show']);
+
+    // products
+    Route::get('products', [ProductController::class, 'index']);
+    Route::get('products/featured', [ProductController::class, 'featured']);
+    Route::get('products/{product}', [ProductController::class, 'show']);
+    Route::get('products/{product}/related', [ProductController::class, 'related']);
+
     // Protected routes (require authentication)
     Route::middleware('auth:sanctum')->group(function () {
 
@@ -29,26 +42,18 @@ Route::prefix('v1')->group(function () {
             // Route::put('/password', [ProfileController::class, 'updatePassword']);
         });
 
-        // Cart routes (example - you'll create these controllers later)
-        // Route::apiResource('cart', CartController::class);
-
-        // Order routes
-        // Route::apiResource('orders', OrderController::class);
-
-        // Wishlist routes
-        // Route::apiResource('wishlist', WishlistController::class);
-
-        // Address routes
-        // Route::apiResource('addresses', AddressController::class);
-
-        // Review routes
-        // Route::post('products/{product}/reviews', [ReviewController::class, 'store']);
-
         // Admin only routes
         Route::middleware('admin')->group(function () {
-            // Route::apiResource('admin/products', Admin\ProductController::class);
-            // Route::apiResource('admin/categories', Admin\CategoryController::class);
-            // Route::apiResource('admin/orders', Admin\OrderController::class);
+            Route::post('categories', [CategoryController::class, 'store']);
+            Route::put('categories/{category}', [CategoryController::class, 'update']);
+            Route::patch('categories/{category}', [CategoryController::class, 'update']);
+            Route::delete('categories/{category}', [CategoryController::class, 'destroy']);
+
+            Route::post('products', [ProductController::class, 'store']);
+            Route::put('products/{product}', [ProductController::class, 'update']);
+            Route::patch('products/{product}', [ProductController::class, 'update']);
+            Route::delete('products/{product}', [ProductController::class, 'destroy']);
+            Route::patch('products/{product}/images/{image}', [ProductController::class, 'updateImage']);
         });
     });
 
@@ -58,5 +63,8 @@ Route::prefix('v1')->group(function () {
 });
 
 Route::fallback(function () {
-    abort(404, 'API resource not found');
+    return response()->json([
+        'code' => 404,
+        'message' => 'Resource not found'
+    ])->setStatusCode(404);
 });
