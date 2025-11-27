@@ -63,13 +63,12 @@ class ProductController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
-        // Search by name, description, or SKU
+        // Search by name, description
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 

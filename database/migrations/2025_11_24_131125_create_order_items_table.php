@@ -15,7 +15,6 @@ return new class extends Migration {
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
             $table->foreignId('product_id')->constrained();
             $table->string('product_name'); // Store name in case product is deleted
-            $table->string('product_sku');
             $table->integer('quantity');
             $table->decimal('price', 10, 2);
             $table->decimal('subtotal', 10, 2);

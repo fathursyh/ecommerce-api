@@ -26,7 +26,6 @@ class ProductResource extends JsonResource
             'discount_percentage' => $this->sale_price
                 ? round((($this->price - $this->sale_price) / $this->price) * 100)
                 : 0,
-            'sku' => $this->sku,
             'stock_quantity' => $this->stock_quantity,
             'in_stock' => $this->stock_quantity > 0,
             'is_active' => $this->is_active,
